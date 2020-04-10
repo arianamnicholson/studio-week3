@@ -8,7 +8,7 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.css" rel="stylesheet" />
   <!-- Adding Mapbox JavaScript file -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js"></script>
-  <!-- Adding styling info for the map -->
+  <!-- Adding styling info for the map and button -->
   <style type="text/css">
     body {
       margin: 0;
@@ -20,7 +20,23 @@
       top: 200px;
       bottom: 0;
       width: 100%;
-    }  </style>
+    }
+
+    #fly {
+display: block;
+position: relative;
+margin: 0px auto;
+width: 50%;
+height: 40px;
+padding: 10px;
+border: none;
+border-radius: 3px;
+font-size: 12px;
+text-align: center;
+color: #fff;
+background: #ee8a65;
+}
+  </style>
   <!-- Adding styling info for page layout by reading in a CSS file -->
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -35,31 +51,75 @@
     <li><a href="mapbox-turfjs.html" target="_self">Output 3</a></li>
   </ul>
   <br>
-
+  <!-- add the map-->
   <div id="map"></div>
+  <!-- add the button-->
+<button id="fly">Fly</button>
+  <!-- geocoder information-->
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css"
+type="text/css"
+/>
+<!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+
+
   <script>
 
     // Initialize the map
-    mapboxgl.accessToken = '<your access token here>';
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYXJpYW5hbW5pY2hvbHNvbiIsImEiOiJjazVpazFndGUwMXUwM2RuanIzMW9mdGc0In0.TytBJMlpMr_WcTlolgjRtw';
     var map = new mapboxgl.Map({
       container: 'map', // container id
       style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
-      center: [-122.44, 37.76], // starting position [lng, lat]
-      zoom: 11 // starting zoom
+      center: [-98.4842, 39.0119], // starting position [lng, lat]
+      zoom: 6 // starting zoom
     });
 
-    // Add a popup: https://docs.mapbox.com/mapbox-gl-js/example/popup/
+    // Add a popup
+    var popup = new mapboxgl.Popup({ closeOnClick: false })
+    .setLngLat([-96, 37.8])
+    .setHTML('<h1>Abolish ICE!</h1>')
+    .addTo(map);
+    // Add pan and zoom controls on the left
+var nav = new mapboxgl.NavigationControl();
+map.addControl(nav, 'top-left');
 
-    // Add pan and zoom controls: https://docs.mapbox.com/mapbox-gl-js/api/#map#addcontrol
-
-    // Add a function that flies to a location: https://docs.mapbox.com/mapbox-gl-js/api/#map#flyto
+    //Add a function that flies to a location: https://docs.mapbox.com/mapbox-gl-js/api/#map#flyto
+    document.getElementById('fly').addEventListener('click', function() {
+    // Fly to a random location by offsetting the point -74.50, 40
+    // by up to 5 degrees.
+    map.flyTo({
+    center: [
+    -74.5 + (Math.random() - 0.5) * 10,
+    40 + (Math.random() - 0.5) * 10
+    ],
+    essential: true // this animation is considered essential with respect to prefers-reduced-motion
+    });
+    });
 
     // Add a function that sets pitch (tilt) to 60 and bearing (rotation) to 45: https://docs.mapbox.com/mapbox-gl-js/api/#map#setpitch and https://docs.mapbox.com/mapbox-gl-js/api/#map#setbearing
-
+    //tilt map to 60 degrees
+    map.setPitch(60)
+    // rotate the map to 45 degrees
+    map.setBearing(45);
     // Add a search box: https://docs.mapbox.com/mapbox-gl-js/example/mapbox-gl-geocoder/
+    map.addControl(
+    new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl
+    })
+    );
 
     // Add a geolocation button: https://docs.mapbox.com/mapbox-gl-js/api/#geolocatecontrol
-
+    map.addControl(new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true
+    }));
     </script>
 
 </body>
